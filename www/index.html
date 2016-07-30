@@ -12,13 +12,31 @@ Roadworks, Delays and Hazards.
 
 
 </p>
-<p>We enhance Android's Google Navigation with data from Transport for
-Christchurch real time and scheduled traffic information.</p>
+<p>We enhance Android's Google Navigation with data from <a href="http://www.tfc.govt.nz/">Transport for
+    Christchurch</a> real time and scheduled traffic information.</p>
 <p>
+
+  <h2>We have an App!</h2>
+
+  <img src="images/AppScreenshot.png" width="400"/>
+
+<p>Coming soon, free, at the Google Playstore.</p>
 
   <h2>API Access</h2>
 
-  You can try it without the a smart phone by filling in where you want to go to <a href="cgi-bin/route">here!</a>
+  You can try it without a smart phone!
+
+  <form action="cgi-bin/route" method="get">
+    Where are you now? <input type="text" size="40" name="origin" value="Christchurch City Council,Hereford St, Christchurch"><br/>
+    Where do you want to go to? <input type="text" size="40" name="destination" value="245 wooldridge road,christchurch">
+    <input type="submit" value="Let's Go!"  />
+
+  </form>
+
+  <h2>Hack the OpenSource code yourself at Github</h2>
+
+  Contributions welcome! https://github.com/john-carter/OpenRoad
+
   
 </body>
 </html>
