@@ -1,0 +1,44 @@
+#!/usr/bin/ruby -w
+
+require 'net/http'
+require 'json'
+
+GOOGLE_MAPS_URL = "https://maps.googleapis.com/maps/api/directions/json"
+GOOGLE_MAPS_KEY = "key=AIzaSyCnNSIiNWSOTO1nHxD7f-MTczEvXeBgAJo"
+
+def build_query( origin, destination)
+  URI("#{GOOGLE_MAPS_URL}?origin=#{origin}&destination=#{destination}")
+end
+
+def printHelpAndExit( plaint="Usage:=")
+
+  STDERR.puts "
+
+#{plaint}
+
+#{__FILE__} --help
+   Output this help text
+
+#{__FILE_} origin destination
+
+  or 
+Run as a cgi script, expecting parameters origin and destination
+
+Outputs JSON result to stdout.
+
+"
+  exit(1)
+end
+
+if ARGV.empty?
+  origin="-43.590887,172.58077"
+  destination="875%20cashmere%20road,christchurch"
+elsif ARGV.size == 2
+  origin,destination = *ARGV
+else
+  printHelpAndExit( "Incorrect number of arguments #{ARGV.inspect}")
+end
+
+
+
+puts Net::HTTP.get(build_query(origin,destination))
