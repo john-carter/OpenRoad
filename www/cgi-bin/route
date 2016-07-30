@@ -1,28 +1,42 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/ruby -wT1
 
 require "cgi"
+require 'uri'
+require 'pp'
 
 cgi = CGI.new("html4")  # add HTML generation methods
+
+form = <<EOFORM
+  <form action="route" method="get">
+    Where are you now? <input type="text" size="40" name="origin" value="Christchurch City Council,Hereford St, Christchurch"><br/>
+    Where do you want to go to? <input type="text" size="40" name="destination" value="245 wooldridge road,christchurch">
+    <input type="submit" value="Let's Go!"  />
+EOFORM
+
+if cgi.params.has_key?( "origin") && cgi.params.has_key?( "destination")
+  origin = cgi.params["origin"].join(" ").gsub(%r{[^a-zA-Z0-9\-_ ]}, '').untaint
+  destination = cgi.params["destination"].join(" ").gsub(%r{[^a-zA-Z0-9\-_ ]}, '').untaint
+
+  cmd = "../../pull_routes '#{origin}' '#{destination}'"
+  route = cmd.inspect + "<br/>" + `#{cmd}`
+  form =""
+else
+  route = ""
+end
+
 cgi.out do
   cgi.html do
     cgi.head do
       cgi.title { "TITLE" }
     end +
     cgi.body do
-      cgi.form("ACTION" => "route", "method"=> "get") do
-        cgi.p do
-          cgi.textarea("get_text") +
-          cgi.br +
-          cgi.submit
-        end
-      end +
-      cgi.pre do
+      form + cgi.pre do
         CGI::escapeHTML(
           "params: #{cgi.params.inspect}\n" +
           "cookies: #{cgi.cookies.inspect}\n" +
           ENV.collect do |key, value|
             "#{key} --> #{value}\n"
-          end.join("")
+          end.join("") + "\n" + route
         )
       end
     end
