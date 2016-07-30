@@ -49,11 +49,12 @@ def getClosedArea(closed_road):
    return areas
 
 def getClosedFocus(closed_road):
+   focuses = []
    for area in closed_road['geometry']['geometries']:
       if area["properties"]["type"] == "focus" and area["properties"]["model"] == "RoadClosure":
-         return area
+         focuses.append(area)
 
-   return None
+   return focuses
 
 
 def isFocusDuplicated(blocks, lat, lon):
@@ -70,25 +71,27 @@ def getAllRoadsClosedOnTheRoute(roadClosures, route):
       point = Point(step)
 
       for closed_road in roadClosures:
-         closed_area = getClosedArea(closed_road)
-         focus_point = getClosedFocus(closed_road)
+         closed_areas = getClosedArea(closed_road)
+         focus_points = getClosedFocus(closed_road)
          
-         if closed_area is not [] and focus_point is not None:
-            for sub_area in closed_area:
+         if closed_areas is not [] and focus_points is not None:
+            for sub_area in closed_areas:
                polygon = shape(sub_area)
 
                if polygon.contains(point):
-                  
-                  if isFocusDuplicated(closed_blocks, focus_point["coordinates"][0], focus_point["coordinates"][1]):
-                     continue
+               
+                  for focus_point in focus_points:
+                     
+                     if isFocusDuplicated(closed_blocks, focus_point["coordinates"][0], focus_point["coordinates"][1]):
+                        continue
 
-                  #print(json.dumps(closed_road, sort_keys=True, indent=4))
-                  
-                  closed_blocks.append({'address'     : closed_road["properties"]["address"],
-                                        'jobtype'     : closed_road["properties"]["jobtype"],
-                                        'description' : closed_road["properties"]["publicdescription"],
-                                        'lat'         : focus_point["coordinates"][0],
-                                        'lng'         : focus_point["coordinates"][1]})
+                     #print(json.dumps(closed_road, sort_keys=True, indent=4))
+                     
+                     closed_blocks.append({'address'     : closed_road["properties"]["address"],
+                                           'jobtype'     : closed_road["properties"]["jobtype"],
+                                           'description' : closed_road["properties"]["publicdescription"],
+                                           'lat'         : focus_point["coordinates"][0],
+                                           'lng'         : focus_point["coordinates"][1]})
    return closed_blocks
 
 def main():
