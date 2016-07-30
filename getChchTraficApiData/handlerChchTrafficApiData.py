@@ -8,7 +8,6 @@ from shapely.geometry import shape, Point
 from datetime import datetime as dt
 
 json_test_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),"govHachGeoJson.txt")
-print json_test_file
 
 def handleArgs():
     parser = argparse.ArgumentParser(description="Gets Google Maps polyline and checks if any roadclosures are on the way.")
