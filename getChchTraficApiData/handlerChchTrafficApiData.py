@@ -42,7 +42,7 @@ def getRoadClosureToday(json_data):
 
 def getClosedArea(closed_road):
    for area in closed_road['geometry']['geometries']:
-      if area["properties"]["type"] == "extent" and area["properties"]["model"] == "TMP":
+      if area["properties"]["type"] == "extent" and area["properties"]["model"] == "RoadClosure":
          return area
 
    return None
