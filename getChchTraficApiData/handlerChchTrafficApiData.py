@@ -12,12 +12,12 @@ json_test_file = "govHachGeoJson.txt"
 def handleArgs():
     parser = argparse.ArgumentParser(description="Gets Google Maps polyline and checks if any roadclosures are on the way.")
 
-    parser.add_argument('--p','-polyline', dest = "polyline", required=True, help="Google Maps polyline")
+    parser.add_argument('--p','-polyline', dest = "polyline", required=True, help="file Google Maps polyline")
 
     args = parser.parse_args()
 
-    cnf = {'polyline'  : args.polyline,
-           'json_file' : json_test_file}
+    cnf = {'polyline_file' : args.polyline,
+           'json_file'     : json_test_file}
 
     return cnf
 
@@ -25,8 +25,6 @@ def getChchJsonData(json_file):
    json_text = open(json_file, 'r').read()
 
    return geojson.loads(json_text)
-
-   #return json.loads(json_text)
 
 def getRoadClosureToday(json_data):
    roadClosureFeatures = []
@@ -59,12 +57,12 @@ def getClosedFocus(closed_road):
 
 def isFocusDuplicated(blocks, lat, lon):
    for block in blocks:
-      if block['lat'] == lat and block['lon'] == lon:
+      if block['lat'] == lat and block['lng'] == lon:
          return True   
 
    return False
 
-def getAnyRoadsClosedOnTheRoute(roadClosures, route):
+def getAllRoadsClosedOnTheRoute(roadClosures, route):
    closed_blocks = []
 
    for step in route:
@@ -86,19 +84,23 @@ def getAnyRoadsClosedOnTheRoute(roadClosures, route):
                                      'jobtype'     : closed_road["properties"]["jobtype"],
                                      'description' : closed_road["properties"]["publicdescription"],
                                      'lat'         : focus_point["coordinates"][0],
-                                     'lon'         : focus_point["coordinates"][1]})
+                                     'lng'         : focus_point["coordinates"][1]})
    return closed_blocks
 
 def main():
-   test_pline = "fe_iGg{i|_@EIIMW[QUKIWWyIyH_]gZkVeTwAqA{BoBGGGIQSIKKO"
+   #test_pline = "fe_iGg{i|_@EIIMW[QUKIWWyIyH_]gZkVeTwAqA{BoBGGGIQSIKKO"
    #test_pline = "prwhGmer|_@oF?CjVHBDF@H`G?HA"
-   cnf = handleArgs();
-   json_data = getChchJsonData(cnf['json_file'])
-   roadClosures = getRoadClosureToday(json_data)
-
-   route = polyline.decode(test_pline)
    
-   closed_blocks =  getAnyRoadsClosedOnTheRoute(roadClosures, route)
-   print(json.dumps(closed_blocks, sort_keys=True, indent=4))
+   cnf = handleArgs();
+   pline = open(cnf['polyline_file'], 'r').read().replace("\\\\", "\\")[:-1]
+
+   json_data = getChchJsonData(cnf['json_file'])
+
+   roadClosures = getRoadClosureToday(json_data)
+   
+   route = polyline.decode(pline)
+   
+   closed_blocks = getAllRoadsClosedOnTheRoute(roadClosures, route)
+   print json.dumps(closed_blocks, sort_keys=True, indent=4)
 
 main()
