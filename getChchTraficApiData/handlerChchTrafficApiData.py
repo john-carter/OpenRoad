@@ -41,11 +41,12 @@ def getRoadClosureToday(json_data):
    return roadClosureFeatures
 
 def getClosedArea(closed_road):
+   areas = []
    for area in closed_road['geometry']['geometries']:
       if area["properties"]["type"] == "extent" and area["properties"]["model"] == "RoadClosure":
-         return area
+         areas.append(area)
 
-   return None
+   return areas
 
 def getClosedFocus(closed_road):
    for area in closed_road['geometry']['geometries']:
@@ -72,19 +73,22 @@ def getAllRoadsClosedOnTheRoute(roadClosures, route):
          closed_area = getClosedArea(closed_road)
          focus_point = getClosedFocus(closed_road)
          
-         if closed_area is not None and focus_point is not None:
-            polygon = shape(closed_area)
+         if closed_area is not [] and focus_point is not None:
+            for sub_area in closed_area:
+               polygon = shape(sub_area)
 
-            if polygon.contains(point):
-               #print(json.dumps(closed_road, sort_keys=True, indent=4))
+               if polygon.contains(point):
+                  
+                  if isFocusDuplicated(closed_blocks, focus_point["coordinates"][0], focus_point["coordinates"][1]):
+                     continue
 
-               if isFocusDuplicated(closed_blocks, focus_point["coordinates"][0], focus_point["coordinates"][1]):
-                  continue
-               closed_blocks.append({'address'     : closed_road["properties"]["address"],
-                                     'jobtype'     : closed_road["properties"]["jobtype"],
-                                     'description' : closed_road["properties"]["publicdescription"],
-                                     'lat'         : focus_point["coordinates"][0],
-                                     'lng'         : focus_point["coordinates"][1]})
+                  #print(json.dumps(closed_road, sort_keys=True, indent=4))
+                  
+                  closed_blocks.append({'address'     : closed_road["properties"]["address"],
+                                        'jobtype'     : closed_road["properties"]["jobtype"],
+                                        'description' : closed_road["properties"]["publicdescription"],
+                                        'lat'         : focus_point["coordinates"][0],
+                                        'lng'         : focus_point["coordinates"][1]})
    return closed_blocks
 
 def main():
@@ -93,6 +97,9 @@ def main():
    
    cnf = handleArgs();
    pline = open(cnf['polyline_file'], 'r').read().replace("\\\\", "\\")
+
+   #pline = "djuhGect|_@AqK?SiAAiB?eB?e@G_@QYYi@k@MK@oDAmA"
+   #pline = "djuhG{bt|_@?mFxE?TARATEVKd@YxAqA^OXEfGAhJ?zJ@zABpIDFGVAR?|BAxCGDBv@@nLAhG?|@??yC?mH?kCAOTAzAAhLK|IIbJCjf@MbD?f@C`CG~OUxAEp@A`@Bl@N\\Nh@d@nAvAlCzCbAfAb@\\FHB?FQHSDGHA@C^AZ?H?hDnBFHFHVXnF|C"
 
    json_data = getChchJsonData(cnf['json_file'])
 
