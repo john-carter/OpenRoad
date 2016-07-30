@@ -72,7 +72,7 @@ def getAllRoadsClosedOnTheRoute(roadClosures, route):
          closed_area = getClosedArea(closed_road)
          focus_point = getClosedFocus(closed_road)
          
-         if closed_area is not None:
+         if closed_area is not None and focus_point is not None:
             polygon = shape(closed_area)
 
             if polygon.contains(point):
