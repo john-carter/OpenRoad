@@ -22,9 +22,11 @@
     }
     
   </style>
+  <link rel="icon" type="image/png"
+	href="images/favicon.png" />
 </head>
 <body lang="en-NZ" dir="ltr">
-<h1>Christchurch Open Road Routing Application:<br/> Commuting without
+<h1>Christchurch Open Road Routing Application:<br/> Commuting without Unexpected
 Roadworks, Delays and Hazards. 
 </h1>
 <p><img src="images/17884176778_e62cfbd14d_b.jpg" name="OpenRoad" alt="Image CC Joe Diaz https://www.flickr.com/photos/blackroompictures/17884176778" width="600" class="banner"/>
@@ -38,6 +40,8 @@ Roadworks, Delays and Hazards.
 </p>
   <img class="banner" src="images/CloserWithInfo.png"/>
   <img class="banner" src="images/4962229615_be2a96f1fc_z.jpg" alt="CC Martin Luff https://www.flickr.com/photos/23934380@N06/4962229615 Attribution-ShareAlike 2.0 Generic" width="400"/>
+
+  <img class="banner" src="images/ClosedRoadWhichGoogleWantsToTake2.png" alt="Sorry Google, I can't do that!" width="800" />
 
 <p>
   Need a better route...?
@@ -53,12 +57,18 @@ Roadworks, Delays and Hazards.
 
   You can try it without a smart phone!
 
-  <form action="cgi-bin/route" method="get">
+  <form action="cgi-bin/route" method="GET">
     Where are you now? <input type="text" size="40" name="origin" value="Christchurch City Council,Hereford St, Christchurch"><br/>
     Where do you want to go to? <input type="text" size="40" name="destination" value="245 wooldridge road,christchurch">
     <input type="submit" value="Let's Go!"  />
 
   </form>
+
+  <h2>Future Directions.</h2>
+
+<p>
+  Importing additional datasets such as intersection crash statistics, sites of scenic interest.
+</p>
 
   <h2>Hack the OpenSource code yourself at Github</h2>
 

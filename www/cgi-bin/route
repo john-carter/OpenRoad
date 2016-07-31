@@ -14,30 +14,28 @@ form = <<EOFORM
 EOFORM
 
 if cgi.params.has_key?( "origin") && cgi.params.has_key?( "destination")
-  origin = cgi.params["origin"].join(" ").gsub(%r{[^a-zA-Z0-9\-_ ]}, '').untaint
-  destination = cgi.params["destination"].join(" ").gsub(%r{[^a-zA-Z0-9\-_ ]}, '').untaint
+  origin = cgi.params["origin"].join(" ").gsub(%r{[^\.,a-zA-Z0-9\-_ ]}, '').untaint
+  destination = cgi.params["destination"].join(" ").gsub(%r{[^\.,a-zA-Z0-9\-_ ]}, '').untaint
 
-  cmd = "../../pull_routes '#{origin}' '#{destination}'"
-  route = cmd.inspect + "<br/>" + `#{cmd}`
-  form =""
+  cmd = "cd ../..;./pull_routes '#{origin}' '#{destination}' | ./scan_routes"
+
+  content = `#{cmd}`
+  
+  puts "\
+Content-Type: text/json\r
+Content-Length: #{content.size}\r
+\r
+"
+  puts content
+  
 else
-  route = ""
-end
-
-cgi.out do
-  cgi.html do
-    cgi.head do
-      cgi.title { "TITLE" }
-    end +
-    cgi.body do
-      form + cgi.pre do
-        CGI::escapeHTML(
-          "params: #{cgi.params.inspect}\n" +
-          "cookies: #{cgi.cookies.inspect}\n" +
-          ENV.collect do |key, value|
-            "#{key} --> #{value}\n"
-          end.join("") + "\n" + route
-        )
+  cgi.out do
+    cgi.html do
+      cgi.head do
+        cgi.title { "TITLE" }
+      end +
+        cgi.body do
+        form
       end
     end
   end

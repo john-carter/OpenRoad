@@ -1,0 +1,35 @@
+#!/usr/bin/ruby -w
+
+require 'json'
+require 'pp'
+
+def printHelpAndExit( plaint="Usage:=")
+
+  STDERR.puts "
+
+#{plaint}
+
+#{__FILE__} --help
+   Output this help text
+
+#{__FILE_} < google_routes.json > routes_plus_impediments.json
+
+
+Runs each polyline overview through alex's impediment finder.
+
+"
+  exit(1)
+end
+
+blob = JSON.parse( STDIN.read)
+
+blob["routes"].each do |route|
+  polyline = route["overview_polyline"]["points"]
+  polyf = "/tmp/a.poly.#{Process.pid}"
+  open(  polyf,'w'){|f| f.syswrite( polyline)}
+  impediments = JSON.parse(IO.read("|python ./getChchTraficApiData/handlerChchTrafficApiData.py --p #{polyf}"))
+  File.unlink polyf
+  route["impediments"] = impediments 
+end
+
+puts blob.to_json({indent: "   ", object_nl: "\n"})

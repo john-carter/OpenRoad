@@ -2,12 +2,13 @@
 
 require 'net/http'
 require 'json'
+require 'pp'
 
 GOOGLE_MAPS_URL = "https://maps.googleapis.com/maps/api/directions/json"
 GOOGLE_MAPS_KEY = "key=AIzaSyCnNSIiNWSOTO1nHxD7f-MTczEvXeBgAJo"
 
 def build_query( origin, destination)
-  URI("#{GOOGLE_MAPS_URL}?origin=#{origin}&destination=#{destination}")
+  URI("#{GOOGLE_MAPS_URL}?origin=#{origin}&destination=#{destination}&alternatives=true&#{GOOGLE_MAPS_KEY}")
 end
 
 def printHelpAndExit( plaint="Usage:=")
@@ -40,5 +41,6 @@ else
 end
 
 
+query = build_query(origin,destination)
 
-puts Net::HTTP.get(build_query(origin,destination))
+puts Net::HTTP.get(query)
