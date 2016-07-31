@@ -4,7 +4,7 @@ import json
 import geojson
 import argparse
 import polyline
-from shapely.geometry import shape, Point
+from shapely.geometry import shape, Point, LineString
 from datetime import datetime as dt
 
 json_test_file = os.path.join(os.path.dirname(os.path.abspath(__file__)),"govHachGeoJson.txt")
@@ -67,9 +67,9 @@ def isFocusDuplicated(blocks, lat, lon):
 def getAllRoadsClosedOnTheRoute(roadClosures, route):
    closed_blocks = []
 
-   for step in route:
-      point = Point(step)
-
+   for i in range(1, len(route)):
+      leg = LineString([route[i-1], route[i]])
+   
       for closed_road in roadClosures:
          closed_areas = getClosedArea(closed_road)
          focus_points = getClosedFocus(closed_road)
@@ -78,7 +78,7 @@ def getAllRoadsClosedOnTheRoute(roadClosures, route):
             for sub_area in closed_areas:
                polygon = shape(sub_area)
 
-               if polygon.contains(point):
+               if polygon.intersects(leg):
                
                   for focus_point in focus_points:
                      
@@ -103,6 +103,7 @@ def main():
 
    #pline = "djuhGect|_@AqK?SiAAiB?eB?e@G_@QYYi@k@MK@oDAmA"
    #pline = "djuhG{bt|_@?mFxE?TARATEVKd@YxAqA^OXEfGAhJ?zJ@zABpIDFGVAR?|BAxCGDBv@@nLAhG?|@??yC?mH?kCAOTAzAAhLK|IIbJCjf@MbD?f@C`CG~OUxAEp@A`@Bl@N\\Nh@d@nAvAlCzCbAfAb@\\FHB?FQHSDGHA@C^AZ?H?hDnBFHFHVXnF|C"
+   #pline = "djuhGsct|_@AcK?SiAAiB?eB?e@G_@QYYi@k@w@o@"
 
    json_data = getChchJsonData(cnf['json_file'])
 
