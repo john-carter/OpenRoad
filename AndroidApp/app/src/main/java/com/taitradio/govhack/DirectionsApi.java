@@ -20,6 +20,8 @@ import java.net.URLEncoder;
 public class DirectionsApi
 {
     final DirectionsHandler _directionsHandler;
+    //final String _urlBase = "https://maps.googleapis.com/maps/api/directions/json";
+    final String _urlBase = "http://10.126.54.146/cgi-bin/route";
 
     public DirectionsApi(DirectionsHandler directionsHandler)
     {
@@ -37,11 +39,11 @@ public class DirectionsApi
                 {
                     String encodedDestination = URLEncoder.encode(destination, "UTF-8");
                     StringBuilder urlBuilder = new StringBuilder();
-                    urlBuilder.append("https://maps.googleapis.com/maps/api/directions/json?");
+                    urlBuilder.append(_urlBase + "?");
                     urlBuilder.append("origin=" + String.valueOf(source.latitude) + "," + String.valueOf(source.longitude));
                     urlBuilder.append("&destination=" + encodedDestination );
-                    urlBuilder.append("&alternatives=" + "true" );
-                    urlBuilder.append("&key=AIzaSyCnNSIiNWSOTO1nHxD7f-MTczEvXeBgAJo");
+                    //urlBuilder.append("&alternatives=" + "true" );
+                    //urlBuilder.append("&key=AIzaSyCnNSIiNWSOTO1nHxD7f-MTczEvXeBgAJo");
 
                     Log.d("DirectionApi", "URL: " + urlBuilder.toString());
                     URL url = new URL(urlBuilder.toString());
@@ -61,10 +63,10 @@ public class DirectionsApi
                     String directions = stringBuilder.toString();
                     GsonBuilder builder = new GsonBuilder();
                     Gson gson = builder.create();
+                    Log.d("DirectionsApi", directions);
                     DirectionsResult result = gson.fromJson(directions, DirectionsResult.class );
 
                     _directionsHandler.showDirections(result);
-                    Log.d("DirectionsApi", directions);
                     return;
                 }
                 catch(Exception e)

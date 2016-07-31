@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.support.v4.app.FragmentActivity;
@@ -11,11 +12,13 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,6 +92,11 @@ public class MainActivity extends FragmentActivity implements DirectionsHandler,
 
     private void getDirections()
     {
+        getDirections(_destinationEditText.getText().toString());
+    }
+
+    private void getDirections(String destination)
+    {
         DirectionsApi directionsApi = new DirectionsApi(this);
         LatLng origin = _currentPosition;
         if(origin == null)
@@ -96,7 +104,7 @@ public class MainActivity extends FragmentActivity implements DirectionsHandler,
             //fall back to GovHack location
             origin = new LatLng(-43.531741, 172.631707);
         }
-        directionsApi.getDirections(origin, _destinationEditText.getText().toString());
+        directionsApi.getDirections(origin, destination);
     }
 
 
@@ -116,6 +124,21 @@ public class MainActivity extends FragmentActivity implements DirectionsHandler,
                 .color(color)//Google maps blue color
                 .geodesic(true)
         );
+
+        if(route.impediments == null)
+        {
+            return;
+        }
+
+        List<Impediment> _impediments = route.impediments;
+
+        for(int index = 0; index < _impediments.size(); index++)
+        {
+            Impediment impediment = _impediments.get(index);
+            LatLng point = new LatLng(impediment.lat, impediment.lng);
+
+            addClosedMarker(point, impediment.description);
+        }
     }
 
     @Override
@@ -146,7 +169,7 @@ public class MainActivity extends FragmentActivity implements DirectionsHandler,
                     .position(start)
                     .title("Start"));
 
-                addClosedMarker(start, "Road is closed due to flooding");
+                //addClosedMarker(new LatLng(-43.529857,172.634394), "Vehicle Lane(s) Closed, Detours In Place, Shoulder Closure");
 
                 LatLng destination = new LatLng(startLocation.lat, startLocation.lng);
                 Marker destinationMarker = _map.addMarker(new MarkerOptions()
@@ -209,6 +232,7 @@ public class MainActivity extends FragmentActivity implements DirectionsHandler,
 
     private List<LatLng> decodePoly(String encoded)
     {
+        Log.d("MainActivity", "ployline: " + encoded);
         List<LatLng> poly = new ArrayList<LatLng>();
         int index = 0, len = encoded.length();
         int lat = 0, lng = 0;
@@ -245,6 +269,47 @@ public class MainActivity extends FragmentActivity implements DirectionsHandler,
     public void onMapReady(GoogleMap googleMap)
     {
         _map = googleMap;
+        _map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+            @Override
+            public void onMapClick(LatLng arg0)
+            {
+                getDirections(String.valueOf(arg0.latitude) + "," + String.valueOf(arg0.longitude));
+                // TODO Auto-generated method stub
+                Log.d("arg0", arg0.latitude + "-" + arg0.longitude);
+            }
+        });
+
+        _map.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter()
+        {
+
+            @Override
+            public View getInfoWindow(Marker arg0) {
+                return null;
+            }
+
+            @Override
+            public View getInfoContents(Marker marker) {
+
+                LinearLayout info = new LinearLayout(getBaseContext());
+                info.setOrientation(LinearLayout.VERTICAL);
+
+                TextView title = new TextView(getBaseContext());
+                title.setTextColor(Color.BLACK);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(null, Typeface.BOLD);
+                title.setText(marker.getTitle());
+
+                TextView snippet = new TextView(getBaseContext());
+                snippet.setTextColor(Color.GRAY);
+                snippet.setText(marker.getSnippet());
+
+                info.addView(title);
+                info.addView(snippet);
+
+                return info;
+            }
+        });
     }
 
     LatLng _currentPosition = null;
@@ -261,7 +326,8 @@ public class MainActivity extends FragmentActivity implements DirectionsHandler,
     }
 
     @Override
-    public void onProviderEnabled(String provider) {
+    public void onProviderEnabled(String provider)
+    {
 
     }
 

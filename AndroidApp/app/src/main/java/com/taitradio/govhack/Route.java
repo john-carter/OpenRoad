@@ -10,5 +10,5 @@ public class Route
     public String summary;
     public List<Leg> legs;
     public Polyline overview_polyline;
-
+    public List<Impediment> impediments;
 }
